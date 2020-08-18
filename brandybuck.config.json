@@ -1,0 +1,5 @@
+{
+  "auth": true,
+  "model_source": "./models.brandybuck.json",
+  "database": "sqlite"
+}

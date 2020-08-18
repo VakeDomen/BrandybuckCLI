@@ -1,8 +1,16 @@
-mod cli;
+extern crate serde;
+extern crate serde_json;
 
+#[macro_use]
+extern crate serde_derive;
+
+mod models;
+mod handlers;
+
+use handlers::config_handler::generate_new_configurations;
 use structopt::StructOpt;
-use cli::CliOptions;
-use cli::Task;
+use models::cli::{CliOptions, Task};
+use log::{info};
 
 fn main() {
     let options = CliOptions::from_args();
@@ -10,12 +18,10 @@ fn main() {
     let task: Task = match &options.command as &str {
         "init" => Task::Init,
         "build" => Task::Build,
-        _e @ _ => Task::None,
+        _ => Task::None,
     };
-
     execute_task(task, options);
 }
-
 
 fn execute_task(task: Task, options: CliOptions) -> () {
     match task {
@@ -25,12 +31,12 @@ fn execute_task(task: Task, options: CliOptions) -> () {
     }
 }
 
-fn init_project(_: CliOptions) -> () {
-
+fn init_project(options: CliOptions) -> () {
+    generate_new_configurations(options);
+    info!("Done!");
 }
 
-
 fn build_project(_: CliOptions) -> () {
-    
+    info!("Done!");
 }
 

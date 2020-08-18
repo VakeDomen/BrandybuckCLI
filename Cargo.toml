@@ -1,0 +1,10 @@
+[package]
+name = "brandybuck_cli"
+version = "0.1.0"
+authors = ["Domen Vake <vake.domen94@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+structopt = "0.3.16"

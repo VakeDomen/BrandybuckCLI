@@ -1,5 +1,0 @@
-{
-    "auth": true,
-    "model_source": "./models.json",
-    "database": "sqlite"
-}

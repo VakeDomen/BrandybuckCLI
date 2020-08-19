@@ -7,7 +7,8 @@ extern crate serde_derive;
 mod models;
 mod handlers;
 
-use handlers::config_handler::{generate_new_configurations, generate_folder_structure};
+use handlers::config_handler::generate_new_configurations;
+use handlers::build_handler::build_application;
 use structopt::StructOpt;
 use models::cli_options::{CliOptions, Task};
 use log::{info};
@@ -36,7 +37,7 @@ fn init_project(options: CliOptions) -> () {
 }
 
 fn build_project(_: CliOptions) -> () {
-    generate_folder_structure();
+    build_application();
     println!("Done!");
 }
 

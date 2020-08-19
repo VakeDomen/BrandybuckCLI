@@ -28,14 +28,3 @@ fn generate_model_template(_options: &CliOptions) -> () {
         MODELS_FILE_NAME.to_string()
     );
 }
-
-pub fn generate_folder_structure() -> () {
-    println!("Generating folders...");
-    generate_folder(String::from("./app/migrations"));
-    generate_folder(String::from("./app/src/models"));
-    generate_folder(String::from("./app/src/models/core"));
-    generate_folder(String::from("./app/src/routes"));
-    generate_folder(String::from("./app/src/db"));
-    generate_folder(String::from("./app/src/auth"));
-    println!("Done generating folders");
-}

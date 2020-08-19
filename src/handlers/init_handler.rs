@@ -1,7 +1,7 @@
 use crate::models::cli_options::CliOptions;
 use crate::models::config_file::ConfigFile;
 use crate::models::models_file::ModelFile;
-use crate::handlers::file_handler::{generate_folder, write_file};
+use crate::helpers::file_helper::{generate_folder, write_file};
 
 static CONFIG_FILE_NAME: &'static str = "./brandybuck.config.json";
 static MODELS_FILE_NAME: &'static str = "./brandybuck.models.json";

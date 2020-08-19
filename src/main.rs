@@ -6,8 +6,9 @@ extern crate serde_derive;
 
 mod models;
 mod handlers;
+mod helpers;
 
-use handlers::config_handler::generate_new_configurations;
+use handlers::init_handler::generate_new_configurations;
 use handlers::build_handler::build_application;
 use structopt::StructOpt;
 use models::cli_options::{CliOptions, Task};

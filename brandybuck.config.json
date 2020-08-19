@@ -1,7 +1,0 @@
-{
-  "project_name": "test_project",
-  "auth": true,
-  "model_source": "./models.brandybuck.json",
-  "database": "sqlite",
-  "documentation": true
-}

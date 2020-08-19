@@ -6,7 +6,8 @@ pub struct ConfigFile {
     auth: bool,
     model_source: PathBuf,
     database: String,
-    documentation: bool
+    documentation: bool,
+    docker: bool
 }
 
 impl ConfigFile {
@@ -14,9 +15,10 @@ impl ConfigFile {
         ConfigFile {
             project_name: String::from("test_project"),
             auth: true,
-            model_source: PathBuf::from("./models.brandybuck.json"),
+            model_source: PathBuf::from("./brandybuck.models.json"),
             database: String::from("sqlite"),
-            documentation: true
+            documentation: true,
+            docker: true
         }
     }
 }

@@ -9,12 +9,11 @@ mod handlers;
 
 use handlers::config_handler::{generate_new_configurations, generate_folder_structure};
 use structopt::StructOpt;
-use models::cli::{CliOptions, Task};
+use models::cli_options::{CliOptions, Task};
 use log::{info};
 
 fn main() {
     let options = CliOptions::from_args();
-
     let task: Task = match &options.command as &str {
         "init" => Task::Init,
         "build" => Task::Build,

@@ -5,14 +5,19 @@ use crate::models::models_file::ModelFile;
 
 pub fn build_application() -> () {
     let config_file: ConfigFile = read_config_file();
-    let models_file: ModelFile = read_model_file(config_file.model_source);
+    let models_file: ModelFile = read_model_file(config_file.model_source.clone());
     generate_folder_structure();
-    // generage_node_package_json(&config_file);
+    generate_node_package_json(&config_file);
 }
 
-// fn generage_node_package_json(&config: ConfigFile) -> () {
-//     let package_json = NodePackage::new(config);
-// }
+fn generate_node_package_json(config: &ConfigFile) -> () {
+    let package_json = NodePackage::new(config);
+    let mut serialized = serde_json::to_string_pretty(&package_json).unwrap();
+    write_file(
+        &mut serialized,
+        "app/package.json".to_string()
+    )
+}
 
 
 

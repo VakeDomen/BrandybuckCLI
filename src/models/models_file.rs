@@ -1,33 +1,35 @@
 #[derive(Serialize, Deserialize)]
 pub struct ModelFile {
-    models: Vec<Model>
+    pub models: Vec<Model>
 }
 
 
 #[derive(Serialize, Deserialize)]
-struct Model {
+pub struct Model {
     #[serde(default="Model::name_default")]
-    name: String,
-    crud: Crud,
-    fields: Vec<Field>
+    pub name: String,
+    pub crud: Crud,
+    pub fields: Vec<Field>
 }
 
 #[derive(Serialize, Deserialize)]
-struct Crud {
-    create: bool,
-    create_auth: bool,
-    read: bool,
-    read_auth: bool,
-    update: bool,
-    update_auth: bool,
-    delete: bool,
-    delete_auth: bool,
+pub struct Crud {
+    pub create: bool,
+    pub create_auth: bool,
+    pub read: bool,
+    pub read_auth: bool,
+    pub update: bool,
+    pub update_auth: bool,
+    pub delete: bool,
+    pub delete_auth: bool,
 }
 
 #[derive(Serialize, Deserialize)]
-struct Field {
-    name: String,
-    data_type: String
+pub struct Field {
+    pub name: String,
+    pub data_type: String,
+    pub key: bool,
+    pub null: bool
 }
 
 impl ModelFile {
@@ -48,15 +50,21 @@ impl ModelFile {
                 fields: vec!(
                     Field {
                         name: String::from("test1"),
-                        data_type: String::from("VARCHAR")
+                        data_type: String::from("VARCHAR"),
+                        key: true,
+                        null: false
                     },
                     Field {
                         name: String::from("test2"),
-                        data_type: String::from("VARCHAR")
+                        data_type: String::from("VARCHAR"),
+                        key: false,
+                        null: false
                     },
                     Field {
                         name: String::from("test3"),
-                        data_type: String::from("VARCHAR")
+                        data_type: String::from("VARCHAR"),
+                        key: false,
+                        null: false
                     },
                 )
             })

@@ -8,6 +8,7 @@ mod models;
 mod handlers;
 mod helpers;
 mod db_generators;
+mod ts_generators;
 
 use handlers::init_handler::generate_new_configurations;
 use handlers::build_handler::build_application;

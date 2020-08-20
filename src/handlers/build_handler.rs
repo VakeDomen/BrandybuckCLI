@@ -5,6 +5,7 @@ use crate::models::db_table_structure::DbTableStructure;
 use crate::models::file_config_tssconfig_json::TsCompilerOptions;
 use crate::models::file_config_package_json::NodePackage;
 use crate::db_generators::sqlite::{generate_sqlite_migation_files, generate_orm_code};
+use crate::ts_generators::file_server::generate_server_file;
 
 pub fn build_application() -> () {
     let config_file: ConfigFile = read_config_file();
@@ -15,9 +16,14 @@ pub fn build_application() -> () {
     generate_migration(&config_file, &models_file);
     generate_orm(&config_file);
     generate_table_config(&config_file, &models_file);
+    generate_server(&config_file,  &models_file);
     
 }
 
+fn generate_server(config_file: &ConfigFile, models_file: &ModelFile) -> () {
+    let mut code = generate_server_file(config_file,  models_file);
+    write_file(&mut code, "app/src/server.ts".to_string());
+ }
 fn generate_table_config(config: &ConfigFile, models: &ModelFile) -> () {
     if config.database == String::from("sqlite") {
         let db_config = DbTableStructure::new(config, models);

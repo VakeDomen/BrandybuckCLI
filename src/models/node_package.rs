@@ -74,7 +74,7 @@ fn generate_dependencies(config: &ConfigFile) -> Map<String, Value> {
     map.insert(String::from("dotenv"), Value::String(String::from("^8.2.0")));
     // auth
     if config.auth {
-        map.insert(String::from("bcrypt"), Value::String(String::from("^4.0.0")));
+        map.insert(String::from("bcrypt"), Value::String(String::from("^5.0.0")));
         map.insert(String::from("jsonwebtoken"), Value::String(String::from("^8.5.1")));
     }
     if config.database == String::from("sqlite") {

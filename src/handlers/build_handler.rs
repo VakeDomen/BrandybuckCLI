@@ -3,7 +3,7 @@ use crate::models::node_package::NodePackage;
 use crate::models::config_file::ConfigFile;
 use crate::models::models_file::ModelFile;
 use crate::models::ts_compiler_options::TsCompilerOptions;
-use crate::helpers::migration_sqlite::generate_sqlite_migation_files;
+use crate::db_generators::sqlite::generate_sqlite_migation_files;
 
 pub fn build_application() -> () {
     let config_file: ConfigFile = read_config_file();

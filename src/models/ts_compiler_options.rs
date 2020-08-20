@@ -1,8 +1,10 @@
+#[allow(non_snake_case)]
 #[derive(Serialize, Deserialize)]
 pub struct TsCompilerOptions {
   pub compilerOptions: CompilerOptions
 }
 
+#[allow(non_snake_case)]
 #[derive(Serialize, Deserialize)]
 pub struct CompilerOptions {
   pub target: String,

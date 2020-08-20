@@ -2,8 +2,8 @@ use std::fs;
 use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
-use crate::models::config_file::ConfigFile;
-use crate::models::models_file::ModelFile;
+use crate::models::brandybuck_config_file::ConfigFile;
+use crate::models::brandybuck_models_file::ModelFile;
 
 pub fn generate_folder(dir: String) -> () {
     let result = fs::create_dir_all(dir.clone());

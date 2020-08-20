@@ -7,7 +7,8 @@ pub struct ConfigFile {
     pub model_source: String,
     pub database: String,
     pub documentation: bool,
-    pub docker: bool
+    pub docker: bool,
+    pub log: bool
 }
 
 impl ConfigFile {
@@ -18,7 +19,8 @@ impl ConfigFile {
             model_source: String::from("./brandybuck.models.json"),
             database: String::from("sqlite"),
             documentation: true,
-            docker: true
+            docker: true,
+            log: true
         }
     }
 }

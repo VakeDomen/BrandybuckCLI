@@ -1,5 +1,5 @@
 use serde_json::{Value, Map};
-use crate::models::config_file::ConfigFile;
+use crate::models::brandybuck_config_file::ConfigFile;
 #[derive(Serialize, Deserialize)]
 pub struct NodePackage {
     name: String,

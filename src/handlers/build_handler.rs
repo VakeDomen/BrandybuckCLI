@@ -1,11 +1,12 @@
-use crate::helpers::file_helper::{generate_folder, write_file, read_config_file, read_model_file};
+use crate::db_generators::sqlite::{generate_orm_code, generate_sqlite_migation_files};
+use crate::helpers::file_helper::{generate_folder, read_config_file, read_model_file, write_file};
 use crate::models::brandybuck_config_file::ConfigFile;
 use crate::models::brandybuck_models_file::ModelFile;
 use crate::models::db_table_structure::DbTableStructure;
-use crate::models::file_config_tssconfig_json::TsCompilerOptions;
 use crate::models::file_config_package_json::NodePackage;
-use crate::db_generators::sqlite::{generate_sqlite_migation_files, generate_orm_code};
+use crate::models::file_config_tssconfig_json::TsCompilerOptions;
 use crate::ts_generators::file_server::generate_server_file;
+use crate::ts_generators::files_models::generate_core_models;
 
 pub fn build_application() -> () {
     let config_file: ConfigFile = read_config_file();
@@ -16,19 +17,29 @@ pub fn build_application() -> () {
     generate_migration(&config_file, &models_file);
     generate_orm(&config_file);
     generate_table_config(&config_file, &models_file);
-    generate_server(&config_file,  &models_file);
-    
+    generate_server(&config_file, &models_file);
+    generate_models(&config_file, &models_file);
+}
+
+fn generate_models(config_file: &ConfigFile, models_file: &ModelFile) -> () {
+    let mut core_models = generate_core_models(config_file, models_file);
+    for model in core_models.iter() {
+        write_file(&mut model.1.clone(), "app/src/models/core/".to_string() + &model.0);
+    }
 }
 
 fn generate_server(config_file: &ConfigFile, models_file: &ModelFile) -> () {
-    let mut code = generate_server_file(config_file,  models_file);
+    let mut code = generate_server_file(config_file, models_file);
     write_file(&mut code, "app/src/server.ts".to_string());
- }
+}
 fn generate_table_config(config: &ConfigFile, models: &ModelFile) -> () {
     if config.database == String::from("sqlite") {
         let db_config = DbTableStructure::new(config, models);
         let mut serialized = serde_json::to_string_pretty(&db_config).unwrap();
-        write_file(&mut serialized, "app/src/db/database.config.json".to_string());
+        write_file(
+            &mut serialized,
+            "app/src/db/database.config.json".to_string(),
+        );
     }
 }
 

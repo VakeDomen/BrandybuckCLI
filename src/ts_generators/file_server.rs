@@ -12,13 +12,19 @@ pub fn generate_server_file(config_file: &ConfigFile, models_file: &ModelFile) -
 
 fn generate_route_binding(config_file: &ConfigFile) -> String {
     let mut code = Vec::new();
-    code.push(String::from("const absPath = path.resolve(__dirname, '.');"));
-    code.push(String::from("fs.readdir(absPath + '/routes/', (err: Error, files: string[]) => {"));
+    code.push(String::from(
+        "const absPath = path.resolve(__dirname, '.');",
+    ));
+    code.push(String::from(
+        "fs.readdir(absPath + '/routes/', (err: Error, files: string[]) => {",
+    ));
     code.push(String::from("\tif (err) {\n\t\tconsole.log('Error processing routes!', err);\n\t\tprocess.exit(1);\n\t}"));
     code.push(String::from("\tfiles.forEach((routeFileName: string) => {\n\t\tconsole.log('Importing ' + routeFileName + '...');\n\t\tapp.use(require(absPath + '/routes/' + routeFileName));\n\t});"));
     code.push(String::from("\tapp.use((req: express.Request, res: express.Response, next: any) => {\n\t\tconst error = new Error('Not found');\n\t\tnext(error);\n\t});"));
     code.push(String::from("\tapp.use((error: any, req: express.Request, res: express.Response, next: any) => {\n\t\tres.status(error.status || 500);\n\t\tres.json({message: error.message});\n\t});"));
-    code.push(String::from("console.log('Backend sucessfully initialised!');"));
+    code.push(String::from(
+        "console.log('Backend sucessfully initialised!');",
+    ));
     code.push(String::from("});"));
     code.join("\n")
 }
@@ -31,9 +37,13 @@ fn generate_database_init(config_file: &ConfigFile) -> String {
 
 fn generate_dotenv_checks(config_file: &ConfigFile) -> String {
     let mut code = Vec::new();
-    code.push(String::from("if (!process.env.PORT) {\n\tconsole.log('Port not specified!');\n\tprocess.exit(1);\n}"));
+    code.push(String::from(
+        "if (!process.env.PORT) {\n\tconsole.log('Port not specified!');\n\tprocess.exit(1);\n}",
+    ));
     if config_file.database == String::from("sqlite") {
-        code.push(String::from("const dbPath: string = process.env.SQLITE_DB || './src/db/data/sqlite.db';"));
+        code.push(String::from(
+            "const dbPath: string = process.env.SQLITE_DB || './src/db/data/sqlite.db';",
+        ));
     }
     code.join("\n")
 }

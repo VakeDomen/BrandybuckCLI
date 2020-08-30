@@ -28,7 +28,6 @@ pub struct Crud {
 pub struct Field {
     pub name: String,
     pub data_type: String,
-    pub key: bool,
     pub null: bool
 }
 
@@ -51,19 +50,16 @@ impl ModelFile {
                     Field {
                         name: String::from("test1"),
                         data_type: String::from("VARCHAR"),
-                        key: true,
                         null: false
                     },
                     Field {
                         name: String::from("test2"),
                         data_type: String::from("VARCHAR"),
-                        key: false,
                         null: false
                     },
                     Field {
                         name: String::from("test3"),
                         data_type: String::from("VARCHAR"),
-                        key: false,
                         null: false
                     },
                 )

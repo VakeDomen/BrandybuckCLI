@@ -49,7 +49,7 @@ fn generate_tables_down(model_file: &ModelFile) -> String {
 fn generate_model_table(model: &Model) -> String {
     let mut table_rows = Vec::new();
     table_rows.push(String::from("CREATE TABLE ") + &model.name + "s (");
-    table_rows.push(String::from("\tid VARCHAR PRIMARY KEY"));
+    table_rows.push(String::from("\tid VARCHAR PRIMARY KEY,"));
     for col in model.fields.iter() {
         let mut column = String::from("\t") + &col.name + " " + &col.data_type + " ";
         if col.null {
@@ -67,7 +67,7 @@ fn generate_model_table(model: &Model) -> String {
 }
 
 fn generate_imports() -> String {
-    "const sqlite = require(\"sqlite\");\nimport { DbItem } from '../models/db.item';\nimport * as config from './config.json';\n".to_string()
+    "const sqlite = require(\"sqlite\");\nimport { DbItem } from '../models/core/db.item';\nimport * as config from './database.config.json';\n".to_string()
 }
 
 fn generate_connection() -> String {
@@ -75,37 +75,37 @@ fn generate_connection() -> String {
 }
 
 fn generate_query_executor() -> String {
-    "export async function query<T>(query: string): Promise<T[]> {\n\tconst db = await dbConnection;\n\tif (config.db.log) {\n\t\tconsole.log(query);\n\t}\n\treturn db.all(query);\n}".to_string()
+    "export async function query<T>(query: string): Promise<T[]> {\n\tconst db = await dbConnection;\n\tif (config.log) {\n\t\tconsole.log(query);\n\t}\n\treturn db.all(query);\n}".to_string()
 }
 
 fn fetch_query() -> String {
-    "export async function fetch<T>(table: string, filter: DbItem): Promise<T[]> {\n\n\treturn query<T>('SELECT * FROM ' + table + ' WHERE ' + filter.whereString());\n}".to_string()
+    "export async function fetch<T>(table: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('SELECT * FROM ' + table + ' WHERE ' + filter.whereString() + ';');\n}".to_string()
 }
 
 fn fetch_similar() -> String {
-    "export async function fetchSimilar<T>(table: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('SELECT * FROM ' + table + ' WHERE ' + filter.whereSimilarString());\n}".to_string()
+    "export async function fetchSimilar<T>(table: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('SELECT * FROM ' + table + ' WHERE ' + filter.whereSimilarString() + ';');\n}".to_string()
 }
 
 fn fetch_all() -> String {
-    "export async function fetchAll<T>(table: string): Promise<T[]> {\n\treturn query<T>('SELECT * FROM ' + table);\n}".to_string()
+    "export async function fetchAll<T>(table: string): Promise<T[]> {\n\treturn query<T>('SELECT * FROM ' + table + ';');\n}".to_string()
 }
 
 fn insert() -> String {
-    "export async function insert<T>(table: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('INSERT INTO ' + table + ' (' + filter.listKeys() + ') VALUES (' + filter.listValues() + ')');\n}".to_string()
+    "export async function insert<T>(table: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('INSERT INTO ' + table + ' (' + filter.listKeys() + ') VALUES (' + filter.listValues() + ');');\n}".to_string()
 }
 
 fn update() -> String {
-    "export async function update<T>(table: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('UPDATE ' + table + ' SET ' + filter.valuesToString() + ' WHERE id=\\'' + filter.id + '\\'');\n}".to_string()
+    "export async function update<T>(table: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('UPDATE ' + table + ' SET ' + filter.valuesToString() + ' WHERE id=\\'' + filter.id + '\\';');\n}".to_string()
 }
 
 fn delete() -> String {
-    "export async function deleteItem<T>(table: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('DELETE FROM ' + table + ' WHERE ' + filter.whereString());\n}".to_string()
+    "export async function deleteItem<T>(table: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('DELETE FROM ' + table + ' WHERE ' + filter.whereString() + ';');\n}".to_string()
 }
 
 fn inner_join() -> String {
-    "export async function innerJoin<T>(t1: string, t2: string, t1key: string, t2key: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('SELECT * FROM ' + t1 + ' AS t1 INNER JOIN ' + t2 + ' as t2 ON t1.' + t1key + ' = t2.' + t2key + ' WHERE ' + filter.whereString() );\n}".to_string()
+    "export async function innerJoin<T>(t1: string, t2: string, t1key: string, t2key: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('SELECT * FROM ' + t1 + ' AS t1 INNER JOIN ' + t2 + ' as t2 ON t1.' + t1key + ' = t2.' + t2key + ' WHERE ' + filter.whereString() + ';');\n}".to_string()
 }
 
 fn left_join() -> String {
-    "export async function leftJoin<T>(t1: string, t2: string, t1key: string, t2key: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('SELECT * FROM ' + t1 + ' AS t1 LEFT JOIN ' + t2 + ' as t2 ON t1.' + t1key + ' = t2.' + t2key + ' WHERE ' + filter.whereString());\n}".to_string()
+    "export async function leftJoin<T>(t1: string, t2: string, t1key: string, t2key: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('SELECT * FROM ' + t1 + ' AS t1 LEFT JOIN ' + t2 + ' as t2 ON t1.' + t1key + ' = t2.' + t2key + ' WHERE ' + filter.whereString() + ';');\n}".to_string()
 }

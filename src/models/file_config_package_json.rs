@@ -1,5 +1,7 @@
 use serde_json::{Value, Map};
 use crate::models::brandybuck_config_file::ConfigFile;
+use crate::db_generators::db_types::DbType;
+
 #[derive(Serialize, Deserialize)]
 pub struct NodePackage {
     name: String,
@@ -40,7 +42,7 @@ fn generate_bugs(config: &ConfigFile) -> Map<String, Value> {
 
 fn generate_scripts(config: &ConfigFile) -> Map<String, Value> {
     let mut map = Map::new();
-    map.insert(String::from("start"), Value::String(String::from("ts-node-dev --respawn --transpileOnly ./src/server.ts")));
+    map.insert(String::from("start"), Value::String(String::from("ts-node-dev --respawn --transpile-only ./src/server.ts")));
     map.insert(String::from("prod"), Value::String(String::from("tsc && node ./build/server.js")));
     map.insert(String::from("tsc"), Value::String(String::from("tsc")));
     map    
@@ -77,9 +79,11 @@ fn generate_dependencies(config: &ConfigFile) -> Map<String, Value> {
         map.insert(String::from("bcrypt"), Value::String(String::from("^5.0.0")));
         map.insert(String::from("jsonwebtoken"), Value::String(String::from("^8.5.1")));
     }
-    if config.database == String::from("sqlite") {
-        map.insert(String::from("sqlite"), Value::String(String::from("^3.0.3")));
-        map.insert(String::from("sqlite3"), Value::String(String::from("^4.1.1")));
+    match config.database {
+        DbType::SQLITE => {
+            map.insert(String::from("sqlite"), Value::String(String::from("^3.0.3")));
+            map.insert(String::from("sqlite3"), Value::String(String::from("^4.1.1")));
+        }
     }
     map
 }

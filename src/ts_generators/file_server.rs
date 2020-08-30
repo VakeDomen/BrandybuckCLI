@@ -1,5 +1,6 @@
 use crate::models::brandybuck_config_file::ConfigFile;
 use crate::models::brandybuck_models_file::ModelFile;
+use crate::db_generators::db_types::DbType;
 
 pub fn generate_server_file(config_file: &ConfigFile, models_file: &ModelFile) -> String {
     let mut code = Vec::new();
@@ -22,9 +23,7 @@ fn generate_route_binding(config_file: &ConfigFile) -> String {
     code.push(String::from("\tfiles.forEach((routeFileName: string) => {\n\t\tconsole.log('Importing ' + routeFileName + '...');\n\t\tapp.use(require(absPath + '/routes/' + routeFileName));\n\t});"));
     code.push(String::from("\tapp.use((req: express.Request, res: express.Response, next: any) => {\n\t\tconst error = new Error('Not found');\n\t\tnext(error);\n\t});"));
     code.push(String::from("\tapp.use((error: any, req: express.Request, res: express.Response, next: any) => {\n\t\tres.status(error.status || 500);\n\t\tres.json({message: error.message});\n\t});"));
-    code.push(String::from(
-        "console.log('Backend sucessfully initialised!');",
-    ));
+    code.push(String::from("\tapp.listen(process.env.PORT);\n\tconsole.log('Backend sucessfully initialised on port ' + process.env.PORT + '!');"));
     code.push(String::from("});"));
     code.join("\n")
 }
@@ -40,10 +39,12 @@ fn generate_dotenv_checks(config_file: &ConfigFile) -> String {
     code.push(String::from(
         "if (!process.env.PORT) {\n\tconsole.log('Port not specified!');\n\tprocess.exit(1);\n}",
     ));
-    if config_file.database == String::from("sqlite") {
-        code.push(String::from(
-            "const dbPath: string = process.env.SQLITE_DB || './src/db/data/sqlite.db';",
-        ));
+    match config_file.database {
+        DbType::SQLITE => {
+            code.push(String::from(
+                "const dbPath: string = process.env.SQLITE_DB || './src/db/data/sqlite.db';",
+            ));
+        }
     }
     code.join("\n")
 }
@@ -85,9 +86,9 @@ fn generate_imports(config_file: &ConfigFile) -> String {
 }
 
 fn import_database(config_file: &ConfigFile) -> String {
-    let mut code = Vec::new();
-    if config_file.database == String::from("sqlite") {
-        code.push(String::from("import sqlite from 'sqlite';"));
+    let mut code: Vec<String> = Vec::new();
+    match config_file.database {
+        DbType::SQLITE => code.push(String::from("import sqlite from 'sqlite';"))
     }
     code.join("\n")
 }

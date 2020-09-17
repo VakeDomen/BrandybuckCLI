@@ -1,7 +1,7 @@
 use crate::db_generators::sqlite::{generate_orm_code, generate_sqlite_migation_files};
 use crate::helpers::file_helper::{generate_folder, read_config_file, read_model_file, write_file};
 use crate::models::brandybuck_config_file::ConfigFile;
-use crate::models::brandybuck_models_file::ModelFile;
+use crate::models::brandybuck_models_file::{ModelFile, Model, Field, Crud};
 use crate::models::db_table_structure::DbTableStructure;
 use crate::models::file_config_package_json::NodePackage;
 use crate::models::file_config_tssconfig_json::TsCompilerOptions;
@@ -9,11 +9,13 @@ use crate::ts_generators::file_server::generate_server_file;
 use crate::ts_generators::files_models::{generate_core_models, generate_app_models};
 use crate::ts_generators::files_dotenv::{generate_dotenv_file, generate_dotenv_sample_file};
 use crate::ts_generators::files_routes::generate_routes_files;
+use crate::ts_generators::files_auth::generate_auth_files;
 use crate::db_generators::db_types::DbType;
 
 pub fn build_application() -> () {
     let config_file: ConfigFile = read_config_file();
-    let models_file: ModelFile = read_model_file(config_file.model_source.clone());
+    let mut models_file: ModelFile = read_model_file(config_file.model_source.clone());
+    init_generation(&config_file, &mut models_file);
     generate_folder_structure(&config_file);
     generate_node_package_json(&config_file);
     generate_ts_config();
@@ -24,6 +26,51 @@ pub fn build_application() -> () {
     generate_models(&config_file, &models_file);
     generate_dotenv(&config_file);
     generate_routes(&config_file, &models_file);
+    if config_file.auth {
+        generate_auth(&config_file);
+    }
+}
+
+fn init_generation(config_file: &ConfigFile, models: &mut ModelFile) -> () {
+    if config_file.auth {
+        models.models.push(Model {
+            name: String::from("user"),
+            crud: Crud {
+                create: false,
+                create_auth: false,
+                read: false,
+                read_auth: false,
+                update: false,
+                update_auth: false,
+                delete: false,
+                delete_auth: false
+            },
+            fields: vec!(
+                Field {
+                    name: String::from("test1"),
+                    data_type: String::from("VARCHAR"),
+                    null: false
+                },
+                Field {
+                    name: String::from("test2"),
+                    data_type: String::from("VARCHAR"),
+                    null: false
+                },
+                Field {
+                    name: String::from("test3"),
+                    data_type: String::from("VARCHAR"),
+                    null: false
+                },
+            )
+        });
+    }
+}
+
+fn generate_auth(config_file: &ConfigFile) -> () {
+    let auth_files = generate_auth_files(config_file);
+    for file in auth_files.iter() {
+        write_file(&mut file.1.clone(), file.0.clone());
+    }
 }
 
 fn generate_routes(config_file: &ConfigFile, models_file: &ModelFile) -> () {

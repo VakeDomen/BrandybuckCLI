@@ -1,5 +1,5 @@
 use crate::models::brandybuck_config_file::ConfigFile;
-use crate::models::brandybuck_models_file::{ModelFile, Model};
+use crate::models::brandybuck_models_file::{ModelFile, Model, Field, Crud};
 
 pub fn generate_sqlite_migation_files(config_file: &ConfigFile, model_file: &ModelFile) -> String {
     let table_models_up = generate_tables_up(model_file);
@@ -58,7 +58,7 @@ fn generate_model_table(model: &Model) -> String {
             column = column + "NOT NULL,";
         }
         table_rows.push(column)
-    }
+    } 
     let row_len = &table_rows.len() - 1;
     let str_len = &table_rows[row_len.clone()].len() - 1;
     table_rows[row_len].remove(str_len);
@@ -99,7 +99,7 @@ fn update() -> String {
 }
 
 fn delete() -> String {
-    "export async function deleteItem<T>(table: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('DELETE FROM ' + table + ' WHERE ' + filter.whereString() + ';');\n}".to_string()
+    "export async function deleteItem<T>(table: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('DELETE FROM ' + table + ' WHERE \\'' + filter.whereString() + '\\';');\n}".to_string()
 }
 
 fn inner_join() -> String {

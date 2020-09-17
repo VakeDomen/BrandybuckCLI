@@ -7,6 +7,7 @@ pub fn generate_server_file(config_file: &ConfigFile, models_file: &ModelFile) -
     code.push(generate_imports(config_file));
     code.push(generate_dotenv_checks(config_file));
     code.push(generate_initialisation(config_file));
+    code.push(generate_middleware(config_file));
     code.push(generate_route_binding(config_file));
     code.join("\n")
 }
@@ -51,6 +52,7 @@ fn generate_dotenv_checks(config_file: &ConfigFile) -> String {
 
 fn generate_middleware(config_file: &ConfigFile) -> String {
     let mut code = Vec::new();
+    code.push(String::from("app.use(cors());"));
     code.push(String::from("app.use(morgan('dev'));"));
     code.push(String::from("app.use(bodyParser.json({limit: '50mb'}));\napp.use(bodyParser.urlencoded({extended: true, limit: '50mb'}));"));
     code.join("\n")

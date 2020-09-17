@@ -6,11 +6,13 @@ use crate::helpers::util_helper::first_letter_to_uppper_case;
 pub fn generate_routes_files(config_file: &ConfigFile, models_file: &ModelFile) -> Vec<(String, String)> {
     let mut files: Vec<(String, String)> = Vec::new();
     for model in models_file.models.iter() {
-        let code = generate_route_file(model, config_file);
-        files.push((
-            model.name.clone() + ".ts",
-            code
-        ));
+        if model.crud.create || model.crud.read || model.crud.update || model.crud.delete {
+            let code = generate_route_file(model, config_file);
+            files.push((
+                model.name.clone() + ".ts",
+                code
+            ));
+        }
     }
     files
 }
@@ -94,7 +96,7 @@ fn generate_initialisation() -> String {
 fn generate_imports(model: &Model, config_file: &ConfigFile) -> String {
     let mut code = Vec::new();
     if config_file.auth {
-        code.push(String::from("import { verifyTokenMiddleware } from '../auth/local.util';"));
+        code.push(String::from("import { verifyTokenMiddleware } from '../auth/local.auth.ts';"));
     }
     code.push(String::from("import { ErrorResponse } from './../models/core/error.response';\nimport { SuccessResponse } from './../models/core/success.response';"));
     code.push(String::from("import * as express from 'express';"));

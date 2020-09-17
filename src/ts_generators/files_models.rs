@@ -7,6 +7,12 @@ pub fn generate_app_models(
     models_file: &ModelFile,
 ) -> Vec<(String, String)> {
     let mut files: Vec<(String, String)> = Vec::new();
+    if config_file.auth {
+        files.push((
+            String::from("user.item.ts"), 
+            generate_user_model(config_file)
+        ));
+    }
     for model in models_file.models.iter() {
         let model_item_file = generate_app_model(model, config_file);
         files.push((
@@ -37,19 +43,37 @@ pub fn generate_core_models(
         String::from("success.response.ts"),
         generate_success_response_model(config_file),
     ));
+    if config_file.auth {
+        files.push((
+            String::from("local.credentials.ts"),
+            generate_local_credentials()
+        ))
+    }
     files
 }
 
-pub fn generate_user_models(
-    config_file: &ConfigFile,
-    models_file: &ModelFile,
-) -> Vec<(String, String)> {
-    let mut files: Vec<(String, String)> = Vec::new();
-    files.push((String::from(""), String::from("")));
-    files.push((String::from(""), String::from("")));
-    files.push((String::from(""), String::from("")));
-    files.push((String::from(""), String::from("")));
-    files
+pub fn generate_local_credentials() -> String {
+    let mut code = Vec::new();
+    code.push(String::from("export class LocalCredentials {"));
+    code.push(String::from("\temail: string;\n\tpassword: string;"));
+    code.push(String::from("\tconstructor(email: string, password: string) {\n\t\tthis.email = email;\n\t\tthis.password = password;\n\t}"));
+    code.push(String::from("}"));
+    code.join("\n")
+}
+
+pub fn generate_user_model(
+    config_file: &ConfigFile
+) -> String {
+    let mut code = Vec::new();
+    code.push(String::from("import { DbItem } from './core/db.item';\nimport * as bcrypt from 'bcrypt';"));
+    code.push(String::from("export class User extends DbItem {"));
+    code.push(String::from("\tname: string;email: string;\tpassword: string;\trole: 'USER' | 'ADMIN' = 'USER';"));
+    code.push(String::from("\tconstructor(data: any) {\n\t\tsuper(data);\n\t\tthis.name = data.name;\n\t\tthis.email = data.email;\n\t\tthis.password = data.password;\n\t\tif (process.env.ADMIN_EMAIL === data.email) {\n\t\t\tthis.role = 'ADMIN';\n\t\t}\n\t}"));
+    code.push(String::from("\tisValid(): boolean {\n\t\tif (!(this.name && this.email && this.password && this.role)) {\n\t\t\treturn false;\n\t\t}\n\t\tif (this.role === 'ADMIN' && this.email !== process.env.ADMIN_EMAIL) {\n\t\t\treturn false;\n\t\t}\n\t\treturn true;\n\t}"));
+    code.push(String::from("\tasync hashPassword(): Promise<void> {\n\t\tthis.password = await bcrypt.hash(this.password, +(process.env.HASH_SALT_ROUNDS || 10));\n\t}"));
+    code.push(String::from("\tasync isPasswordSame(password: string): Promise<boolean> {\n\t\treturn this.password === await bcrypt.hash(password, +(process.env.HASH_SALT_ROUNDS || 10));\n\t}"));
+    code.push(String::from("}"));
+    code.join("\n")
 }
 
 fn generate_app_model(model: &Model, config_file: &ConfigFile) -> String {
@@ -63,9 +87,13 @@ fn generate_app_model(model: &Model, config_file: &ConfigFile) -> String {
     for field in model.fields.iter() {
         code.push(String::from("\t\tthis.") + &field.name + " = data." + &field.name + ";");
     }
+    
     code.push(String::from("\t}"));
+    if config_file.auth && model.name == String::from("user") {
+        code.push(String::from("\tisValid(): boolean {\n\t\tif (!(this.name && this.email && this.password && this.role)) {\n\t\t\treturn false;\n\t\t}\n\t\tif (this.role === 'ADMIN' && this.email !== process.env.ADMIN_EMAIL) {\n\t\t\treturn false;\n\t\t}\n\t\treturn true;\n\t}"));
+        code.push(String::from("\tasync hashPassword(): Promise<void> {\n\t\tthis.password = await bcrypt.hash(this.password, +(process.env.HASH_SALT_ROUNDS || 10));\n\t}\n\nasync isPasswordSame(password: string): Promise<boolean> {\n\t\treturn this.password === await bcrypt.hash(password, +(process.env.HASH_SALT_ROUNDS || 10));\n\t}"));  
+    }
     code.push(String::from("}"));
-
     code.join("\n")
 }
 

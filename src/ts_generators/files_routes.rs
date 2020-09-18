@@ -6,13 +6,32 @@ use crate::helpers::util_helper::first_letter_to_uppper_case;
 pub fn generate_routes_files(config_file: &ConfigFile, models_file: &ModelFile) -> Vec<(String, String)> {
     let mut files: Vec<(String, String)> = Vec::new();
     for model in models_file.models.iter() {
-        let code = generate_route_file(model, config_file);
+        if model.crud.create || model.crud.read || model.crud.update || model.crud.delete {
+            let code = generate_route_file(model, config_file);
+            files.push((
+                model.name.clone() + ".ts",
+                code
+            ));
+        }
+    }
+    if config_file.auth {
         files.push((
-            model.name.clone() + ".ts",
-            code
+            String::from("auth.ts"),
+            generate_auth_route(config_file)
         ));
     }
     files
+}
+
+fn generate_auth_route(config_file: &ConfigFile) -> String {
+    let mut code = Vec::new();
+    code.push(String::from("import {login, register} from '../auth/local.auth';\nimport * as express from 'express';\nimport { Response } from '../models/core/response';\n"));
+    code.push(String::from("const router: express.Router = express.Router();\n"));
+    // TODO: types of auth
+    code.push(String::from("router.post('/auth/local/register', async (req: express.Request, resp: express.Response) => {\n\tconst response: Response = await register(req);\n\tresponse.send(resp);\n});"));
+    code.push(String::from("router.post('/auth/local/login', async (req: express.Request, resp: express.Response) => {\n\tconst response: Response = await login(req);\n\tresponse.send(resp);\n});"));
+    code.push(String::from("module.exports = router;"));
+    code.join("\n")
 }
 
 fn generate_route_file(model: &Model, config_file: &ConfigFile) -> String {
@@ -94,7 +113,7 @@ fn generate_initialisation() -> String {
 fn generate_imports(model: &Model, config_file: &ConfigFile) -> String {
     let mut code = Vec::new();
     if config_file.auth {
-        code.push(String::from("import { verifyTokenMiddleware } from '../auth/local.util';"));
+        code.push(String::from("import { verifyTokenMiddleware } from '../auth/local.auth.ts';"));
     }
     code.push(String::from("import { ErrorResponse } from './../models/core/error.response';\nimport { SuccessResponse } from './../models/core/success.response';"));
     code.push(String::from("import * as express from 'express';"));

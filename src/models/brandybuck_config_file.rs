@@ -18,7 +18,7 @@ impl ConfigFile {
         ConfigFile {
             project_name: String::from("test_project"),
             port: 3000,
-            auth: false,
+            auth: true,
             model_source: String::from("./brandybuck.models.json"),
             database: DbType::SQLITE,
             documentation: true,

@@ -11,10 +11,14 @@ pub struct DbTableStructure {
 
 impl DbTableStructure {
     pub fn new(config: &ConfigFile, models: &ModelFile) -> DbTableStructure {
-        DbTableStructure {
+        let mut db_structure = DbTableStructure {
            tables: generate_tables(models),
            log: config.log.clone()
+        };
+        if config.auth {
+            db_structure.tables.insert(String::from("user"), Value::String(String::from("users")));
         }
+        db_structure
     }
 }
 

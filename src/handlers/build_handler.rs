@@ -1,7 +1,7 @@
 use crate::db_generators::sqlite::{generate_orm_code, generate_sqlite_migation_files};
 use crate::helpers::file_helper::{generate_folder, read_config_file, read_model_file, write_file};
 use crate::models::brandybuck_config_file::ConfigFile;
-use crate::models::brandybuck_models_file::ModelFile;
+use crate::models::brandybuck_models_file::{ModelFile};
 use crate::models::db_table_structure::DbTableStructure;
 use crate::models::file_config_package_json::NodePackage;
 use crate::models::file_config_tssconfig_json::TsCompilerOptions;
@@ -9,6 +9,7 @@ use crate::ts_generators::file_server::generate_server_file;
 use crate::ts_generators::files_models::{generate_core_models, generate_app_models};
 use crate::ts_generators::files_dotenv::{generate_dotenv_file, generate_dotenv_sample_file};
 use crate::ts_generators::files_routes::generate_routes_files;
+use crate::ts_generators::files_auth::generate_auth_files;
 use crate::db_generators::db_types::DbType;
 
 pub fn build_application() -> () {
@@ -24,6 +25,16 @@ pub fn build_application() -> () {
     generate_models(&config_file, &models_file);
     generate_dotenv(&config_file);
     generate_routes(&config_file, &models_file);
+    if config_file.auth {
+        generate_auth(&config_file);
+    }
+}
+
+fn generate_auth(config_file: &ConfigFile) -> () {
+    let auth_files = generate_auth_files(config_file);
+    for file in auth_files.iter() {
+        write_file(&mut file.1.clone(), file.0.clone());
+    }
 }
 
 fn generate_routes(config_file: &ConfigFile, models_file: &ModelFile) -> () {

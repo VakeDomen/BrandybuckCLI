@@ -1,9 +1,8 @@
 use crate::models::brandybuck_config_file::ConfigFile;
-use crate::models::brandybuck_models_file::{ModelFile, Model};
-
+use crate::models::brandybuck_models_file::{ModelFile, Model, Crud, Field};
 pub fn generate_sqlite_migation_files(config_file: &ConfigFile, model_file: &ModelFile) -> String {
-    let table_models_up = generate_tables_up(model_file);
-    let table_models_down = generate_tables_down(model_file);
+    let table_models_up = generate_tables_up(config_file, model_file);
+    let table_models_down = generate_tables_down(config_file, model_file);
     let migration_string = String::from("-- Up\n") + &table_models_up + "\n-- Down\n" + &table_models_down;
     migration_string
 }
@@ -30,18 +29,24 @@ fn generate_queries() -> String {
     queries.join("\n")
 }
 
-fn generate_tables_up(model_file: &ModelFile) -> String {
+fn generate_tables_up(config_file: &ConfigFile, model_file: &ModelFile) -> String {
     let mut tables: Vec<String> = Vec::new();
     for model in model_file.models.iter() {
         tables.push(generate_model_table(model));
     }
+    if config_file.auth {
+        tables.push(generate_model_table(&user_model()));
+    }
     tables.join("\n")
 }
 
-fn generate_tables_down(model_file: &ModelFile) -> String {
+fn generate_tables_down(config_file: &ConfigFile, model_file: &ModelFile) -> String {
     let mut tables: Vec<String> = Vec::new();
     for model in model_file.models.iter() {
-        tables.push(String::from("DROP TABLE ") + &model.name + ";");
+        tables.push(String::from("DROP TABLE ") + &model.name + "s;");
+    }
+    if config_file.auth {
+        tables.push(String::from("DROP TABLE users;"))
     }
     tables.join("\n")
 }
@@ -58,12 +63,50 @@ fn generate_model_table(model: &Model) -> String {
             column = column + "NOT NULL,";
         }
         table_rows.push(column)
-    }
+    } 
     let row_len = &table_rows.len() - 1;
     let str_len = &table_rows[row_len.clone()].len() - 1;
     table_rows[row_len].remove(str_len);
     table_rows.push(String::from(");\n"));
     table_rows.join("\n")
+}
+
+fn user_model() -> Model {
+    Model {
+        name: String::from("user"),
+        crud: Crud {
+            create: false,
+            create_auth: false,
+            read: false,
+            read_auth: false,
+            update: false,
+            update_auth: false,
+            delete: false,
+            delete_auth: false
+        },
+        fields: vec!(
+            Field {
+                name: String::from("name"),
+                data_type: String::from("VARCHAR"),
+                null: false
+            },
+            Field {
+                name: String::from("email"),
+                data_type: String::from("VARCHAR"),
+                null: false
+            },
+            Field {
+                name: String::from("password"),
+                data_type: String::from("VARCHAR"),
+                null: false
+            },
+            Field {
+                name: String::from("role"),
+                data_type: String::from("VARCHAR"),
+                null: false
+            },
+        )
+    }
 }
 
 fn generate_imports() -> String {
@@ -99,7 +142,7 @@ fn update() -> String {
 }
 
 fn delete() -> String {
-    "export async function deleteItem<T>(table: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('DELETE FROM ' + table + ' WHERE ' + filter.whereString() + ';');\n}".to_string()
+    "export async function deleteItem<T>(table: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('DELETE FROM ' + table + ' WHERE \\'' + filter.whereString() + '\\';');\n}".to_string()
 }
 
 fn inner_join() -> String {

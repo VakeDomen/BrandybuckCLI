@@ -82,7 +82,7 @@ fn generate_dependencies(config: &ConfigFile) -> Map<String, Value> {
     match config.database {
         DbType::SQLITE => {
             map.insert(String::from("sqlite"), Value::String(String::from("^3.0.3")));
-            map.insert(String::from("sqlite3"), Value::String(String::from("^4.1.1")));
+            map.insert(String::from("sqlite3"), Value::String(String::from("^5.0.0")));
         }
     }
     map

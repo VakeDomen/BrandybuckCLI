@@ -113,7 +113,7 @@ fn generate_initialisation() -> String {
 fn generate_imports(model: &Model, config_file: &ConfigFile) -> String {
     let mut code = Vec::new();
     if config_file.auth {
-        code.push(String::from("import { verifyTokenMiddleware } from '../auth/local.auth.ts';"));
+        code.push(String::from("import { verifyTokenMiddleware } from '../auth/local.auth';"));
     }
     code.push(String::from("import { ErrorResponse } from './../models/core/error.response';\nimport { SuccessResponse } from './../models/core/success.response';"));
     code.push(String::from("import * as express from 'express';"));

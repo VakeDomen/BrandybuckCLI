@@ -23,7 +23,7 @@ fn generate_login() -> String {
     code.push(String::from("\tif (!validCredentials(credentials)) {"));
     code.push(String::from("\t\treturn new ErrorResponse(400, 'Invalid credentials');"));
     code.push(String::from("\t}"));
-    code.push(String::from("\tconst users = await fetch(config.tables.users, new User({ email: credentials.email }));"));
+    code.push(String::from("\tconst users = await fetch(config.tables.user, new User({ email: credentials.email }));"));
     code.push(String::from("\tif (!users || users.length !== 1) {"));
     code.push(String::from("\t\treturn new ErrorResponse(401, 'Unauthorized!');"));
     code.push(String::from("\t}"));
@@ -42,16 +42,17 @@ fn generate_register() -> String {
     let mut code = Vec::new();
     code.push(String::from("export async function register(request: express.Request): Promise<Response> {"));
     code.push(String::from("\tconst user = new User(request.body);"));
-    code.push(String::from("\tconst existingUser = await fetch(config.tables.users, new User({ email: user.email }));"));
+    code.push(String::from("\tconst existingUser = await fetch(config.tables.user, new User({ email: user.email }));"));
     code.push(String::from("\tif (existingUser && existingUser.length > 0) {"));
     code.push(String::from("\t\treturn new ErrorResponse(409, 'User with that email already exists!');"));
     code.push(String::from("\t}"));
+    code.push(String::from("\tif (user.email === process.env.ADMIN_EMAIL) {\n\t\tuser.role = 'ADMIN';\n\t} else {\n\t\tuser.role = 'USER';\n\t}"));
     code.push(String::from("\tif (!user.isValid()) {"));
     code.push(String::from("\t\treturn new ErrorResponse(400, 'Invalid credentials!');"));
     code.push(String::from("\t}"));
     code.push(String::from("\tuser.generateId();"));
     code.push(String::from("\tawait user.hashPassword();"));
-    code.push(String::from("\tawait insert(config.tables.users, user);"));
+    code.push(String::from("\tawait insert(config.tables.user, user);"));
     code.push(String::from("\treturn new SuccessResponse(201, 'User registered');"));
     code.push(String::from("}"));
     code.join("\n")
@@ -73,7 +74,7 @@ fn generate_token_verification_middleware() -> String {
     code.push(String::from("\t\tnew ErrorResponse(401, 'Unauthorized').send(resp);"));
     code.push(String::from("\t} else {"));
     code.push(String::from("\t\tconst user: User = new User(userJSON);"));
-    code.push(String::from("\t\tconst loggedUser = await fetch(config.tables.users, user);"));
+    code.push(String::from("\t\tconst loggedUser = await fetch(config.tables.user, user);"));
     code.push(String::from("\t\tObject.assign(req, { token: token, loggedUser: loggedUser.pop() });"));
     code.push(String::from("\t\tnext();"));
     code.push(String::from("\t}"));

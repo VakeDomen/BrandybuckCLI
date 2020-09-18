@@ -7,17 +7,17 @@ pub fn generate_app_models(
     models_file: &ModelFile,
 ) -> Vec<(String, String)> {
     let mut files: Vec<(String, String)> = Vec::new();
-    if config_file.auth {
-        files.push((
-            String::from("user.item.ts"), 
-            generate_user_model(config_file)
-        ));
-    }
     for model in models_file.models.iter() {
         let model_item_file = generate_app_model(model, config_file);
         files.push((
             model.name.clone() + ".item.ts",
             model_item_file
+        ));
+    }
+    if config_file.auth {
+        files.push((
+            String::from("user.item.ts"), 
+            generate_user_model(config_file)
         ));
     }
     files

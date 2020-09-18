@@ -14,7 +14,24 @@ pub fn generate_routes_files(config_file: &ConfigFile, models_file: &ModelFile) 
             ));
         }
     }
+    if config_file.auth {
+        files.push((
+            String::from("auth.ts"),
+            generate_auth_route(config_file)
+        ));
+    }
     files
+}
+
+fn generate_auth_route(config_file: &ConfigFile) -> String {
+    let mut code = Vec::new();
+    code.push(String::from("import {login, register} from '../auth/local.auth';\nimport * as express from 'express';\nimport { Response } from '../models/core/response';\n"));
+    code.push(String::from("const router: express.Router = express.Router();\n"));
+    // TODO: types of auth
+    code.push(String::from("router.post('/auth/local/register', async (req: express.Request, resp: express.Response) => {\n\tconst response: Response = await register(req);\n\tresponse.send(resp);\n});"));
+    code.push(String::from("router.post('/auth/local/login', async (req: express.Request, resp: express.Response) => {\n\tconst response: Response = await login(req);\n\tresponse.send(resp);\n});"));
+    code.push(String::from("module.exports = router;"));
+    code.join("\n")
 }
 
 fn generate_route_file(model: &Model, config_file: &ConfigFile) -> String {

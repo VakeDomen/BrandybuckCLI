@@ -15,14 +15,13 @@ description: |
 
 base: core18
 confinement: devmode
-
+grade: stable
 
 parts:
   brandybuck:
     plugin: rust
     source: https://github.com/VakeDomen/BrandybuckCLI.git
     build-packages: [g++]
-    
 
 apps:
   brandybuck:

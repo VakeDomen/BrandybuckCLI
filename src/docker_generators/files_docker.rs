@@ -1,4 +1,4 @@
-use crate::models::brandybuck_config_file::{ConfigFile, Docker};
+use crate::models::brandybuck_config_file::{ConfigFile, Docker, DockerConfig, Traefik, TraefikConfig};
 use crate::ts_generators::files_dotenv::{generate_docker_environment, generate_dotenv_file, generate_dotenv_sample_file};
 
 pub fn generate_docker_files(config_file: &ConfigFile) -> Vec<(String, String)> {
@@ -6,8 +6,8 @@ pub fn generate_docker_files(config_file: &ConfigFile) -> Vec<(String, String)> 
     files.push((String::from("Dockerfile"), genrate_dockerfile_file(config_file)));
     files.push((String::from("docker-compose.yml"), genrate_docker_compose_file(config_file)));
     files.push((String::from("server.entrypoint.sh"), genrate_entrypoint_file(config_file)));
-    files.push((String::from(".env"), generate_dotenv_file(config_file)));
-    files.push((String::from(".env.sample"), generate_dotenv_sample_file(config_file)));
+    files.push((String::from(".env"), generate_dotenv_file(config_file, true)));
+    files.push((String::from(".env.sample"), generate_dotenv_sample_file(config_file, true)));
     files
 }
 
@@ -34,6 +34,34 @@ fn genrate_docker_compose_file(config_file: &ConfigFile) -> String {
     code.push(String::from("    build:\n      context: .\n      dockerfile: ./Dockerfile"));
     code.push(String::from("    environment:\n") + &generate_docker_environment(config_file));
     code.push(format!("    ports:\n      - \"{docker_port}:{be_port}\"", docker_port = docker_port, be_port = config_file.port));
+    code.push(generate_traefik2(config_file));
+    code.join("\n")
+}
+
+fn generate_traefik2(config_file: &ConfigFile) -> String {
+    let traefik_config: Option<TraefikConfig> = config_file.get_traefik2_conf();
+    match traefik_config {
+        Some(conf) => {
+            let mut code = Vec::new();
+            code.push(format!("    networks:\n      - {network}", network = conf.proxy_network_name));
+            code.push(generate_traefik2_labels(config_file));
+            code.join("\n")
+        },
+        None => String::from("")
+    }
+}
+
+fn generate_traefik2_labels(config_file: &ConfigFile) -> String {
+    let traefik_config_option: Option<TraefikConfig> = config_file.get_traefik2_conf();
+    let mut code = Vec::new();
+    if let Some(traefik_config) = traefik_config_option {
+        code.push(String::from("    labels:"));
+        code.push(format!("      - traefik.http.routers.{name}.rule=Host({domain_env})", name = traefik_config.container_name, domain_env = String::from("`${BACKEND_DOMAIN}`")));
+        code.push(format!("      - traefik.http.routers.{name}.entrypoints = {entrypoint}", name = traefik_config.container_name, entrypoint = traefik_config.entrypoint_name));
+        code.push(format!("      - traefik.http.routers.{name}.tls = true", name = traefik_config.container_name));
+        code.push(format!("      - traefik.http.routers.{name}.tls.certreolver = {certresolver}", name = traefik_config.container_name, certresolver = traefik_config.certresolver_name));
+        code.push(format!("      - traefik.http.routers.{name}.loabalancer.server.port = {port}", name = traefik_config.container_name, port = config_file.port));
+    }
     code.join("\n")
 }
 

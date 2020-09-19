@@ -19,9 +19,6 @@ confinement: devmode
 
 parts:
   brandybuck:
-    override-build: |
-      [ -f "$SNAPCRAFT_PART_INSTALL/bin/brandybuck_cli" ] && rm "$SNAPCRAFT_PART_INSTALL/bin/brandybuck_cli"
-      snapcraftctl build
     plugin: rust
     source: https://github.com/VakeDomen/BrandybuckCLI.git
     build-packages: [g++]

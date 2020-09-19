@@ -1,0 +1,29 @@
+name: brandybuck
+version: git
+summary: Tool for generating backend RESTful APIs
+description: |
+  Brandybuck is a command line tool, that allows developers
+  to generate fully working web REST API servers. Brandybuck
+  generates a functioning NodeJS application running Express.
+  The user may define a JSON configuration file, upon which the
+  application is generated. The features include:
+    - Model specification
+    - Database support
+    - Authentication
+    - Docker support
+    - Traefik v2 reverse proxy support
+
+base: core18
+confinement: devmode
+
+
+parts:
+  brandybuck:
+    plugin: rust
+    source: https://github.com/VakeDomen/BrandybuckCLI.git
+    build-packages: [g++]
+    
+
+apps:
+  brandybuck:
+    command: brandybuck_cli

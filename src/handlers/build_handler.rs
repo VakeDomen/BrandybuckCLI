@@ -64,9 +64,9 @@ fn generate_routes(config_file: &ConfigFile, models_file: &ModelFile) -> () {
 }
 
 fn generate_dotenv(config_file: &ConfigFile) -> () {
-    let mut dotenv = generate_dotenv_file(config_file);
+    let mut dotenv = generate_dotenv_file(config_file, false);
     write_file(&mut dotenv, String::from("./") + &config_file.project_name + "/app/.env");
-    let mut dotenv_sample = generate_dotenv_sample_file(config_file);
+    let mut dotenv_sample = generate_dotenv_sample_file(config_file, false);
     write_file(&mut dotenv_sample, String::from("./") + &config_file.project_name + "/app/.env.sample");
 }
 

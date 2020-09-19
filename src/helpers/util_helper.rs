@@ -41,9 +41,9 @@ pub fn map_db_type_to_ts(db_filed_type: &String, db_type: &DbType) -> String {
   }
 }
 
-pub fn random_key() -> String {
+pub fn random_key(len: usize) -> String {
   thread_rng()
       .sample_iter(&Alphanumeric)
-      .take(30)
+      .take(len)
       .collect()
 }

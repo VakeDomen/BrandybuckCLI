@@ -14,7 +14,7 @@ pub struct ConfigFile {
     pub log: bool
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(default = "default_traefik")]
 pub struct TraefikConfig {
     pub container_name: String,
@@ -24,21 +24,21 @@ pub struct TraefikConfig {
     pub domain: String
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(default = "default_docker")]
 pub struct DockerConfig {
     pub port: i32,
     pub traefik2: Traefik,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(untagged)]
 pub enum Docker {
     Bool(bool),
     Config(DockerConfig)
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(untagged)]
 pub enum Traefik {
     Bool(bool),
@@ -67,7 +67,7 @@ fn default_docker() -> DockerConfig {
 
 fn default_traefik() -> TraefikConfig {
     TraefikConfig {
-        container_name: String::from("brandybuck_traefik_container_") + &random_key(),
+        container_name: String::from("brandybuck_traefik_container_") + &random_key(5),
         proxy_network_name: String::from("proxy"),
         certresolver_name: String::from("le"),
         entrypoint_name: String::from("websecure"),
@@ -75,8 +75,58 @@ fn default_traefik() -> TraefikConfig {
     }
 }
 
+impl TraefikConfig {
+    pub fn new() -> TraefikConfig {
+        default_traefik()
+    }
+}
+
+impl DockerConfig {
+    pub fn new() -> DockerConfig {
+        default_docker()
+    }
+}
+
+
 impl ConfigFile {
     pub fn new() -> ConfigFile {
         default_config()
+    }
+
+    pub fn get_traefik2_conf(&self) -> Option<TraefikConfig> {
+        match self.docker.clone() {
+            Docker::Bool(b) => {
+                if b { 
+                    match DockerConfig::new().traefik2 {
+                        Traefik::Bool(b) => {
+                            if b {
+                                Some(TraefikConfig::new())
+                            } else {
+                                None
+                            }
+                        }
+                        Traefik::Config(conf) => {
+                            Some(conf)
+                        }
+                    }
+                } else {
+                    None
+                }
+            },
+            Docker::Config(doc_conf) => {
+                match doc_conf.traefik2 {
+                    Traefik::Bool(b) => {
+                        if b {
+                            Some(TraefikConfig::new())
+                        } else {
+                            None
+                        }
+                    }
+                    Traefik::Config(conf) => {
+                        Some(conf.clone())
+                    }
+                }
+            }
+        }
     }
 }

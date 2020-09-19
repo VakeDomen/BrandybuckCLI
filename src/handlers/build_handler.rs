@@ -1,6 +1,6 @@
 use crate::db_generators::sqlite::{generate_orm_code, generate_sqlite_migation_files};
 use crate::helpers::file_helper::{generate_folder, read_config_file, read_model_file, write_file};
-use crate::models::brandybuck_config_file::ConfigFile;
+use crate::models::brandybuck_config_file::{ConfigFile, Docker};
 use crate::models::brandybuck_models_file::{ModelFile};
 use crate::models::db_table_structure::DbTableStructure;
 use crate::models::file_config_package_json::NodePackage;
@@ -11,7 +11,8 @@ use crate::ts_generators::files_dotenv::{generate_dotenv_file, generate_dotenv_s
 use crate::ts_generators::files_routes::generate_routes_files;
 use crate::ts_generators::files_auth::generate_auth_files;
 use crate::db_generators::db_types::DbType;
-use crate::docker_generators::files_docker::generate_dockerization_files;
+use crate::docker_generators::files_docker::generate_docker_files;
+
 
 pub fn build_application() -> () {
     let config_file: ConfigFile = read_config_file();
@@ -29,13 +30,20 @@ pub fn build_application() -> () {
     if config_file.auth {
         generate_auth(&config_file);
     }
-    if config_file.docker {
-        generate_dockerization(&config_file);
-    }
+    generate_dockerization(&config_file);
+    
 }
 
 fn generate_dockerization(config_file: &ConfigFile) -> () {
-    let files = generate_dockerization_files(config_file);
+    match &config_file.docker {
+        Docker::Bool(b) => if *b { generate_dockerization_files(config_file) },
+        Docker::Config(conf) => generate_dockerization_files(config_file)
+    }
+    
+}
+
+fn generate_dockerization_files(config_file: &ConfigFile) -> () {
+    let files = generate_docker_files(config_file);
     for file in files.iter() {
         write_file(&mut file.1.clone(), String::from("./") + &config_file.project_name + "/" + &file.0.clone());
     }

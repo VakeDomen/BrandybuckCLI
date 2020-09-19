@@ -1,7 +1,6 @@
 use crate::models::brandybuck_config_file::ConfigFile;
 use crate::db_generators::db_types::DbType;
-use rand::{thread_rng, Rng};
-use rand::distributions::Alphanumeric;
+use crate::helpers::util_helper::random_key;
 
 pub fn generate_dotenv_file(config_file: &ConfigFile) -> String {
     let mut code = Vec::new();
@@ -51,9 +50,3 @@ pub fn generate_docker_environment(config_file: &ConfigFile) -> String {
     code.join("\n")
 }
 
-fn random_key() -> String {
-    thread_rng()
-        .sample_iter(&Alphanumeric)
-        .take(30)
-        .collect()
-}

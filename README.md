@@ -12,6 +12,22 @@ The features include:
 The generated web server may serve as a complete backend appliction for smaller projects, or can be expanded and provide 
 a fast start on the way to the desired project.
   
+- [Installing](#installing)  
+- [Usage](#usage)  
+- [Init](#init)  
+  - [Metadata configuration](#metadata-configuration)  
+  - [Docker configuration](#docker-configuration)  
+  - [Trefik configuration](#trefik-configuration)  
+- [Models](#models)  
+  - [Name](#name)  
+  - [CRUD](#crud)  
+  - [Fields](#fields)  
+- [Build](#build)  
+  - [Folder structure](#folder-structure)  
+  - [Authentication](#authentication)  
+- [Running the generated server](#running-the-generated-server)  
+  - [Modifying environment](#modifying-environment)  
+  
   
 # Installing 
 The tool may be installed from the snap store by running the command

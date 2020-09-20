@@ -7,7 +7,8 @@ The features include:
   - Database support
   - Authentication
   - Docker support
-  - Traefik v2 reverse proxy support  
+  - Traefik v2 reverse proxy support
+  
 The generated web server may serve as a complete backend appliction for smaller projects, or can be expanded and provide 
 a fast start on the way to the desired project.
   

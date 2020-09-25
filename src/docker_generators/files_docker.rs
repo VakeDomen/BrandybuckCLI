@@ -1,11 +1,11 @@
-use crate::models::brandybuck_config_file::{ConfigFile, Docker, DockerConfig, Traefik, TraefikConfig};
+use crate::models::brandybuck_config_file::{ConfigFile, Docker, TraefikConfig};
 use crate::ts_generators::files_dotenv::{generate_docker_environment, generate_dotenv_file, generate_dotenv_sample_file};
 
 pub fn generate_docker_files(config_file: &ConfigFile) -> Vec<(String, String)> {
     let mut files: Vec<(String, String)> = Vec::new();
     files.push((String::from("Dockerfile"), genrate_dockerfile_file(config_file)));
     files.push((String::from("docker-compose.yml"), genrate_docker_compose_file(config_file)));
-    files.push((String::from("server.entrypoint.sh"), genrate_entrypoint_file(config_file)));
+    files.push((String::from("server.entrypoint.sh"), genrate_entrypoint_file()));
     files.push((String::from(".env"), generate_dotenv_file(config_file, true)));
     files.push((String::from(".env.sample"), generate_dotenv_sample_file(config_file, true)));
     files
@@ -26,7 +26,7 @@ fn genrate_dockerfile_file(config_file: &ConfigFile) -> String {
 fn genrate_docker_compose_file(config_file: &ConfigFile) -> String {
     let mut code = Vec::new();
     let docker_port = match &config_file.docker {
-        Docker::Bool(b) => config_file.port,
+        Docker::Bool(_) => config_file.port,
         Docker::Config(config) => config.port
     };
     code.push(String::from("version: '3.2'"));
@@ -87,7 +87,7 @@ fn generate_traefik2_labels(config_file: &ConfigFile) -> String {
     code.join("\n")
 }
 
-fn genrate_entrypoint_file(config_file: &ConfigFile) -> String {
+fn genrate_entrypoint_file() -> String {
     let mut code = Vec::new();
     code.push(String::from("#!/bin/bash"));
     code.push(String::from("echo \"Starting service in $PWD\""));

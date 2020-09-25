@@ -1,3 +1,5 @@
+use crate::db_generators::db_types::{DbField, SqliteTypes};
+
 #[derive(Serialize, Deserialize)]
 pub struct ModelFile {
     pub models: Vec<Model>
@@ -29,7 +31,7 @@ pub struct Crud {
 #[serde(default = "default_field")]
 pub struct Field {
     pub name: String,
-    pub data_type: String,
+    pub data_type: DbField,
     pub null: bool
 }
 
@@ -68,14 +70,14 @@ fn default_crud() -> Crud {
 fn default_field() -> Field {
     Field {
         name: String::from("col"),
-        data_type: String::from("VARCHAR"),
+        data_type: DbField::SqliteField(SqliteTypes::VARCHAR),
         null: false
     }
 }
 fn default_named_field(name: String) -> Field {
     Field {
         name: name,
-        data_type: String::from("VARCHAR"),
+        data_type: DbField::SqliteField(SqliteTypes::VARCHAR),
         null: false
     }
 }

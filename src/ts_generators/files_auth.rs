@@ -1,12 +1,10 @@
-use crate::models::brandybuck_config_file::ConfigFile;
-
-pub fn generate_auth_files(config_file: &ConfigFile) -> Vec<(String, String)> {
+pub fn generate_auth_files() -> Vec<(String, String)> {
     let mut files: Vec<(String, String)> = Vec::new();
-    files.push((String::from("app/src/auth/local.auth.ts"), generate_local_auth(config_file)));
+    files.push((String::from("app/src/auth/local.auth.ts"), generate_local_auth()));
     files
 }
 
-fn generate_local_auth(config_file: &ConfigFile) -> String {
+fn generate_local_auth() -> String {
     let mut code = Vec::new();
     code.push(generate_imports());
     code.push(generate_login());

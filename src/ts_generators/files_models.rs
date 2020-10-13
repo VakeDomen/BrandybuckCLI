@@ -1,6 +1,8 @@
 use crate::models::brandybuck_config_file::ConfigFile;
 use crate::models::brandybuck_models_file::{ModelFile, Model};
-use crate::helpers::util_helper::{first_letter_to_uppper_case, map_db_type_to_ts};
+use crate::helpers::util_helper::first_letter_to_uppper_case;
+use crate::db_generators::db_types::map_field_to_ts_type;
+
 
 pub fn generate_app_models(
     config_file: &ConfigFile,
@@ -17,7 +19,7 @@ pub fn generate_app_models(
     if config_file.auth {
         files.push((
             String::from("user.item.ts"), 
-            generate_user_model(config_file)
+            generate_user_model()
         ));
     }
     files
@@ -29,19 +31,19 @@ pub fn generate_core_models(
     let mut files: Vec<(String, String)> = Vec::new();
     files.push((
         String::from("db.item.ts"),
-        generate_db_item_model(config_file),
+        generate_db_item_model(),
     ));
     files.push((
         String::from("response.ts"),
-        generate_response_model(config_file),
+        generate_response_model(),
     ));
     files.push((
         String::from("error.response.ts"),
-        generate_error_response_model(config_file),
+        generate_error_response_model(),
     ));
     files.push((
         String::from("success.response.ts"),
-        generate_success_response_model(config_file),
+        generate_success_response_model(),
     ));
     if config_file.auth {
         files.push((
@@ -61,9 +63,7 @@ pub fn generate_local_credentials() -> String {
     code.join("\n")
 }
 
-pub fn generate_user_model(
-    config_file: &ConfigFile
-) -> String {
+pub fn generate_user_model() -> String {
     let mut code = Vec::new();
     code.push(String::from("import { DbItem } from './core/db.item';\nimport * as bcrypt from 'bcrypt';"));
     code.push(String::from("export class User extends DbItem {"));
@@ -81,7 +81,7 @@ fn generate_app_model(model: &Model, config_file: &ConfigFile) -> String {
     code.push(String::from("import { DbItem } from './core/db.item';"));
     code.push(String::from("export class ") + &first_letter_to_uppper_case(&model.name) + " extends DbItem {");
     for field in model.fields.iter() {
-        code.push(String::from("\t") + &field.name + ": " + &map_db_type_to_ts(&field.data_type, &config_file.database) + ";");
+        code.push(String::from("\t") + &field.name + ": " + &map_field_to_ts_type(&field.data_type) + ";");
     }
     code.push(String::from("\tconstructor(data: any) {\n\t\tsuper(data);"));
     for field in model.fields.iter() {
@@ -97,7 +97,7 @@ fn generate_app_model(model: &Model, config_file: &ConfigFile) -> String {
     code.join("\n")
 }
 
-fn generate_db_item_model(config_file: &ConfigFile) -> String {
+fn generate_db_item_model() -> String {
     let mut code = Vec::new();
     code.push(String::from("const uuidv4 = require('uuid/v4');\n"));
     code.push(String::from("export class DbItem {\n"));
@@ -115,7 +115,7 @@ fn generate_db_item_model(config_file: &ConfigFile) -> String {
     code.join("\n")
 }
 
-fn generate_response_model(config_file: &ConfigFile) -> String {
+fn generate_response_model() -> String {
     let mut code: Vec<String> = Vec::new();
     code.push(String::from("import * as express from 'express';"));
     code.push(String::from("export class Response {"));
@@ -128,7 +128,7 @@ fn generate_response_model(config_file: &ConfigFile) -> String {
     code.join("\n")
 }
 
-fn generate_error_response_model(config_file: &ConfigFile) -> String {
+fn generate_error_response_model() -> String {
     let mut code: Vec<String> = Vec::new();
     code.push(String::from("import { Response } from './response';"));
     code.push(String::from("export class ErrorResponse extends Response {"));
@@ -139,7 +139,7 @@ fn generate_error_response_model(config_file: &ConfigFile) -> String {
     code.join("\n")
 }
 
-fn generate_success_response_model(config_file: &ConfigFile) -> String {
+fn generate_success_response_model() -> String {
     let mut code: Vec<String> = Vec::new();
     code.push(String::from("import { Response } from './response';"));
     code.push(String::from("export class SuccessResponse extends Response {"));

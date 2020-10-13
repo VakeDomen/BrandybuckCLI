@@ -24,23 +24,23 @@ impl NodePackage {
             version: String::from("1.0.0"),
             description: String::from("Backend application for") + &config.project_name.clone(),
             main: String::from("src/server.ts"),
-            scripts: generate_scripts(config),
-            repository: generate_repository(config),
+            scripts: generate_scripts(),
+            repository: generate_repository(),
             author: String::from("Author"),
             license: String::from("ISC"),
-            bugs: generate_bugs(config),
+            bugs: generate_bugs(),
             homepage: String::from("GitHub link here"),
             dependencies: generate_dependencies(config)
         }
     }
 }
-fn generate_bugs(config: &ConfigFile) -> Map<String, Value> {
+fn generate_bugs() -> Map<String, Value> {
     let mut map = Map::new();
     map.insert(String::from("url"), Value::String(String::from("git+https://github.com/_/issues")));
     map
 }
 
-fn generate_scripts(config: &ConfigFile) -> Map<String, Value> {
+fn generate_scripts() -> Map<String, Value> {
     let mut map = Map::new();
     map.insert(String::from("start"), Value::String(String::from("ts-node-dev --respawn --transpile-only ./src/server.ts")));
     map.insert(String::from("prod"), Value::String(String::from("tsc && node ./build/server.js")));
@@ -48,7 +48,7 @@ fn generate_scripts(config: &ConfigFile) -> Map<String, Value> {
     map    
 }
 
-fn generate_repository(config: &ConfigFile) -> Map<String, Value> {
+fn generate_repository() -> Map<String, Value> {
     let mut map = Map::new();
     map.insert(String::from("type"), Value::String(String::from("git")));
     map.insert(String::from("url"), Value::String(String::from("git+https://github.com/")));

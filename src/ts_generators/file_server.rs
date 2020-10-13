@@ -1,18 +1,17 @@
 use crate::models::brandybuck_config_file::ConfigFile;
-use crate::models::brandybuck_models_file::ModelFile;
 use crate::db_generators::db_types::DbType;
 
-pub fn generate_server_file(config_file: &ConfigFile, models_file: &ModelFile) -> String {
+pub fn generate_server_file(config_file: &ConfigFile) -> String {
     let mut code = Vec::new();
     code.push(generate_imports(config_file));
     code.push(generate_dotenv_checks(config_file));
-    code.push(generate_initialisation(config_file));
-    code.push(generate_middleware(config_file));
-    code.push(generate_route_binding(config_file));
+    code.push(generate_initialisation());
+    code.push(generate_middleware());
+    code.push(generate_route_binding());
     code.join("\n")
 }
 
-fn generate_route_binding(config_file: &ConfigFile) -> String {
+fn generate_route_binding() -> String {
     let mut code = Vec::new();
     code.push(String::from(
         "const absPath = path.resolve(__dirname, '.');",
@@ -29,7 +28,7 @@ fn generate_route_binding(config_file: &ConfigFile) -> String {
     code.join("\n")
 }
 
-fn generate_database_init(config_file: &ConfigFile) -> String {
+fn generate_database_init() -> String {
     let mut code = Vec::new();
     code.push("const db = Promise.resolve().then(() => sqlite.open(dbPath)).then(db => {\n\t// db.migrate({ force: 'last' });\n\tdb.migrate({});\n});");
     code.join("\n")
@@ -50,7 +49,7 @@ fn generate_dotenv_checks(config_file: &ConfigFile) -> String {
     code.join("\n")
 }
 
-fn generate_middleware(config_file: &ConfigFile) -> String {
+fn generate_middleware() -> String {
     let mut code = Vec::new();
     code.push(String::from("app.use(cors());"));
     code.push(String::from("app.use(morgan('dev'));"));
@@ -58,12 +57,12 @@ fn generate_middleware(config_file: &ConfigFile) -> String {
     code.join("\n")
 }
 
-fn generate_initialisation(config_file: &ConfigFile) -> String {
+fn generate_initialisation() -> String {
     let mut code = Vec::new();
     code.push(String::from("console.log('Initialising backend...');"));
-    code.push(generate_database_init(config_file));
+    code.push(generate_database_init());
     code.push(String::from("const app: express.Application = express();"));
-    code.push(generate_middleware(config_file));
+    code.push(generate_middleware());
     code.join("\n")
 }
 

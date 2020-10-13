@@ -17,13 +17,13 @@ pub fn generate_routes_files(config_file: &ConfigFile, models_file: &ModelFile) 
     if config_file.auth {
         files.push((
             String::from("auth.ts"),
-            generate_auth_route(config_file)
+            generate_auth_route()
         ));
     }
     files
 }
 
-fn generate_auth_route(config_file: &ConfigFile) -> String {
+fn generate_auth_route() -> String {
     let mut code = Vec::new();
     code.push(String::from("import {login, register} from '../auth/local.auth';\nimport * as express from 'express';\nimport { Response } from '../models/core/response';\n"));
     code.push(String::from("const router: express.Router = express.Router();\n"));

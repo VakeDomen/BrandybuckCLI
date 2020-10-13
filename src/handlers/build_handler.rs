@@ -23,7 +23,7 @@ pub fn build_application() -> () {
     generate_migration(&config_file, &models_file);
     generate_orm(&config_file);
     generate_table_config(&config_file, &models_file);
-    generate_server(&config_file, &models_file);
+    generate_server(&config_file);
     generate_models(&config_file, &models_file);
     generate_dotenv(&config_file);
     generate_routes(&config_file, &models_file);
@@ -37,7 +37,7 @@ pub fn build_application() -> () {
 fn generate_dockerization(config_file: &ConfigFile) -> () {
     match &config_file.docker {
         Docker::Bool(b) => if *b { generate_dockerization_files(config_file) },
-        Docker::Config(conf) => generate_dockerization_files(config_file)
+        Docker::Config(_) => generate_dockerization_files(config_file)
     }
     
 }
@@ -50,7 +50,7 @@ fn generate_dockerization_files(config_file: &ConfigFile) -> () {
 }
 
 fn generate_auth(config_file: &ConfigFile) -> () {
-    let auth_files = generate_auth_files(config_file);
+    let auth_files = generate_auth_files();
     for file in auth_files.iter() {
         write_file(&mut file.1.clone(), String::from("./") + &config_file.project_name + "/" + &file.0.clone());
     }
@@ -81,8 +81,8 @@ fn generate_models(config_file: &ConfigFile, models_file: &ModelFile) -> () {
     }
 }
 
-fn generate_server(config_file: &ConfigFile, models_file: &ModelFile) -> () {
-    let mut code = generate_server_file(config_file, models_file);
+fn generate_server(config_file: &ConfigFile) -> () {
+    let mut code = generate_server_file(config_file);
     write_file(&mut code, String::from("./") + &config_file.project_name + "/app/src/server.ts");
 }
 fn generate_table_config(config_file: &ConfigFile, models: &ModelFile) -> () {

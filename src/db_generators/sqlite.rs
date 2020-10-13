@@ -1,5 +1,7 @@
 use crate::models::brandybuck_config_file::ConfigFile;
 use crate::models::brandybuck_models_file::{ModelFile, Model, Crud, Field};
+use crate::db_generators::db_types::{DbField, SqliteTypes};
+
 pub fn generate_sqlite_migation_files(config_file: &ConfigFile, model_file: &ModelFile) -> String {
     let table_models_up = generate_tables_up(config_file, model_file);
     let table_models_down = generate_tables_down(config_file, model_file);
@@ -56,7 +58,7 @@ fn generate_model_table(model: &Model) -> String {
     table_rows.push(String::from("CREATE TABLE ") + &model.name + "s (");
     table_rows.push(String::from("\tid VARCHAR PRIMARY KEY,"));
     for col in model.fields.iter() {
-        let mut column = String::from("\t") + &col.name + " " + &col.data_type + " ";
+        let mut column = String::from("\t") + &col.name + " " + &col.data_type.to_string() + " ";
         if col.null {
             column = column + "NULL,";
         } else {
@@ -87,22 +89,22 @@ fn user_model() -> Model {
         fields: vec!(
             Field {
                 name: String::from("name"),
-                data_type: String::from("VARCHAR"),
+                data_type: DbField::SqliteField(SqliteTypes::VARCHAR),
                 null: false
             },
             Field {
                 name: String::from("email"),
-                data_type: String::from("VARCHAR"),
+                data_type: DbField::SqliteField(SqliteTypes::VARCHAR),
                 null: false
             },
             Field {
                 name: String::from("password"),
-                data_type: String::from("VARCHAR"),
+                data_type: DbField::SqliteField(SqliteTypes::VARCHAR),
                 null: false
             },
             Field {
                 name: String::from("role"),
-                data_type: String::from("VARCHAR"),
+                data_type: DbField::SqliteField(SqliteTypes::VARCHAR),
                 null: false
             },
         )

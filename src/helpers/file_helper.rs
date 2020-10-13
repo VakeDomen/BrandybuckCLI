@@ -16,6 +16,7 @@ pub fn generate_folder(dir: String) -> () {
     }
 }
 
+#[allow(dead_code)]
 pub fn copy_file(source: String, destination: String) -> () {
     let result = fs::copy(source.clone(), destination.clone());
     match result {

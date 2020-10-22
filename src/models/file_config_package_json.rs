@@ -59,7 +59,7 @@ fn generate_dependencies(config: &ConfigFile) -> Map<String, Value> {
     let mut map = Map::new();
     // TS
     map.insert(String::from("typescript"), Value::String(String::from("^3.7.5")));
-    map.insert(String::from("ts-node-dev"), Value::String(String::from("^1.0.0-pre.44")));
+    map.insert(String::from("ts-node-dev"), Value::String(String::from("1.0.0-pre.44")));
     map.insert(String::from("@types/node"), Value::String(String::from("^13.7.4")));
     // types
     map.insert(String::from("@types/express"), Value::String(String::from("^4.17.2")));
@@ -82,7 +82,6 @@ fn generate_dependencies(config: &ConfigFile) -> Map<String, Value> {
     match config.database {
         DbType::SQLITE => {
             map.insert(String::from("sqlite"), Value::String(String::from("^3.0.3")));
-            map.insert(String::from("sqlite3"), Value::String(String::from("^5.0.0")));
         }
     }
     map

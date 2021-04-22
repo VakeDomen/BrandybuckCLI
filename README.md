@@ -42,7 +42,7 @@ It can work in one of two ways. Either you can run it with `init` or `build` com
 # Init
 Before building the web server, Brandybuck has to know what kind od server you want. Running the command 
 ```
-branybuck init
+brandybuck init
 ```
 will create two files within the directory from which it was run. The files will be called `brandybuck.config.json` 
 and `brandybuck.models.json`. The files are used by the developer to specify the configurations of the web server

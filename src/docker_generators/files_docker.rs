@@ -77,12 +77,12 @@ fn generate_traefik2_labels(config_file: &ConfigFile) -> String {
     let mut code = Vec::new();
     if let Some(traefik_config) = traefik_config_option {
         code.push(String::from("    labels:"));
-        code.push(format!("      - traefik.enable = true"));
+        code.push(format!("      - traefik.enable=true"));
         code.push(format!("      - traefik.http.routers.{name}.rule=Host({domain_env})", name = traefik_config.container_name, domain_env = String::from("`${DOMAIN}`")));
-        code.push(format!("      - traefik.http.routers.{name}.entrypoints = {entrypoint}", name = traefik_config.container_name, entrypoint = traefik_config.entrypoint_name));
-        code.push(format!("      - traefik.http.routers.{name}.tls = true", name = traefik_config.container_name));
-        code.push(format!("      - traefik.http.routers.{name}.tls.certresolver = {certresolver}", name = traefik_config.container_name, certresolver = traefik_config.certresolver_name));
-        code.push(format!("      - traefik.http.services.{name}.loadbalancer.server.port = {port}", name = traefik_config.container_name, port = config_file.port));
+        code.push(format!("      - traefik.http.routers.{name}.entrypoints={entrypoint}", name = traefik_config.container_name, entrypoint = traefik_config.entrypoint_name));
+        code.push(format!("      - traefik.http.routers.{name}.tls=true", name = traefik_config.container_name));
+        code.push(format!("      - traefik.http.routers.{name}.tls.certresolver={certresolver}", name = traefik_config.container_name, certresolver = traefik_config.certresolver_name));
+        code.push(format!("      - traefik.http.services.{name}.loadbalancer.server.port={port}", name = traefik_config.container_name, port = config_file.port));
     }
     code.join("\n")
 }

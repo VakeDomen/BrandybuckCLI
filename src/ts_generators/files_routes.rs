@@ -84,7 +84,7 @@ fn generate_delete(model: &Model, config_file: &ConfigFile) -> String {
 fn generate_insert(model: &Model, config_file: &ConfigFile) -> String {
     let mut code = Vec::new();
     let route = String::from(&model.name) + "/";
-    let auth: String = if config_file.auth && model.crud.insert_auth { String::from("verifyTokenMiddleware, ") } else { String::from("") };
+    let auth: String = if config_file.auth && model.crud.create_auth { String::from("verifyTokenMiddleware, ") } else { String::from("") };
     code.push(format!("router.post('/{route}', {auth} async (req: express.Request, resp: express.Response) => {sq}", route = route, auth = auth, sq = String::from("{")));
     code.push(format!("\tconst {model}s = await insert(conf.tables.{model}, new {upper_case_model}(req.body).generateId()).catch(err => {sq}", model = &model.name, upper_case_model = &first_letter_to_uppper_case(&model.name), sq = String::from("{")));
     code.push(format!("\t\treturn new ErrorResponse().setError(err).send(resp);\n\t{sq});", sq = String::from("}")));
@@ -98,7 +98,7 @@ fn generate_read(model: &Model, config_file: &ConfigFile) -> String {
     let auth: String = if config_file.auth && model.crud.read_auth { String::from("verifyTokenMiddleware, ") } else { String::from("") };
     code.push(format!("router.get('/{route}', {auth} async (req: express.Request, resp: express.Response) => {sq}", route = route, auth = auth, sq = String::from("{")));
     code.push(format!("\tconst {model}s = await fetch(conf.tables.{model}, new {upper_case_model}(req.query)).catch(err => {sq}", model = &model.name, upper_case_model = &first_letter_to_uppper_case(&model.name), sq = String::from("{")));
-    code.push(format!("\t\tconsole.log(err);return new ErrorResponse().setError(err).send(resp);\n\t{sq});", sq = String::from("}")));
+    code.push(format!("\t\treturn new ErrorResponse().setError(err).send(resp);\n\t{sq});", sq = String::from("}")));
     code.push(format!("\treturn new SuccessResponse().setData({model}s).send(resp);\n{sq});\n", model = &model.name, sq = String::from("}")));
     code.join("\n")
 }

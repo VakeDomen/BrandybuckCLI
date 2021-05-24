@@ -75,7 +75,7 @@ fn generate_delete(model: &Model, config_file: &ConfigFile) -> String {
     let route = String::from(&model.name) + "/";
     let auth: String = if config_file.auth && model.crud.delete_auth { String::from("verifyTokenMiddleware, ") } else { String::from("") };
     code.push(format!("router.delete('/{route}:id', {auth} async (req: express.Request, resp: express.Response) => {sq}", route = route, auth = auth, sq = String::from("{")));
-    code.push(format!("\tawait deleteItem(conf.tables.{model}, new {upper_case_model}(req.params['id'])).catch(err => {sq}", model = &model.name, upper_case_model = &first_letter_to_uppper_case(&model.name), sq = String::from("{")));
+    code.push(format!("\tawait deleteItem(conf.tables.{model}, new {upper_case_model}({id: req.params['id']})).catch(err => {sq}", model = &model.name, upper_case_model = &first_letter_to_uppper_case(&model.name), sq = String::from("{")));
     code.push(format!("\t\treturn new ErrorResponse().setError(err).send(resp);\n\t{sq});", sq = String::from("}")));
     code.push(format!("\treturn new SuccessResponse().send(resp);\n{sq});\n", sq = String::from("}")));
     code.join("\n")

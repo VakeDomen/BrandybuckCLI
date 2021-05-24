@@ -144,7 +144,7 @@ fn update() -> String {
 }
 
 fn delete() -> String {
-    "export async function deleteItem<T>(table: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('DELETE FROM ' + table + ' WHERE \\'' + filter.whereString() + '\\';');\n}".to_string()
+    "export async function deleteItem<T>(table: string, filter: DbItem): Promise<T[]> {\n\treturn query<T>('DELETE FROM ' + table + ' WHERE ' + filter.whereString() + ';');\n}".to_string()
 }
 
 fn inner_join() -> String {
